@@ -1,17 +1,18 @@
 app:
+  port: "8080"
   name: "Raxmet"
   version: "1.0.0"
   env: "development"
   debug: true
-
-server:
-  port: "8080"
+  maxBody: 50
+  maxWorkers: 10
+  maxRequests: 100
 
 database:
   host: "localhost"
-  user: "your_db_user"
-  password: "your_db_password"
-  name: "splitwise_db"
+  user: "raxmet"
+  password: "raxmet_db"
+  name: "raxmet"
   port: 5432
 
 minio:

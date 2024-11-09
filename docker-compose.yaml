@@ -1,0 +1,45 @@
+services:
+  database:
+    image: postgres:15.5
+    container_name: 'raxmet_database'
+    tty: true
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "raxmet_db"
+      POSTGRES_USER: "raxmet"
+      POSTGRES_PASSWORD: "raxmet"
+    volumes:
+      - raxmet_database:/var/lib/postgresql/data
+    networks:
+      - raxmet-network
+  redis:
+    image: redis:latest
+    container_name: 'raxmet_redis'
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - raxmet_redis:/data
+    networks:
+      - raxmet-network
+  golang:
+    container_name: 'raxmet_app'
+    build:
+      context: .
+      dockerfile: docker/golang/Dockerfile
+    depends_on:
+      - database
+      - redis
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app:delegated
+    networks:
+      - raxmet-network
+networks:
+  raxmet-network:
+    driver: bridge
+volumes:
+  raxmet_database:
+  raxmet_redis:

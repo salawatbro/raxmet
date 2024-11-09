@@ -4,7 +4,6 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	App      AppConfig
-	Server   ServerConfig
 	Database DatabaseConfig
 	Minio    MinioConfig
 	Redis    RedisConfig
@@ -30,15 +29,15 @@ type RedisConfig struct {
 	Port int
 }
 
-type ServerConfig struct {
-	Port string
-}
-
 type AppConfig struct {
-	Env     string
-	Name    string
-	Version string
-	Debug   bool
+	Port        string
+	Env         string
+	Name        string
+	Version     string
+	Debug       bool
+	MaxBody     int
+	MaxWorkers  int
+	MaxRequests int
 }
 
 func SetupConfig() (*Config, error) {
