@@ -7,6 +7,7 @@ type Config struct {
 	Database DatabaseConfig
 	Minio    MinioConfig
 	Redis    RedisConfig
+	JWT      JWTConfig
 }
 
 type DatabaseConfig struct {
@@ -25,8 +26,10 @@ type MinioConfig struct {
 }
 
 type RedisConfig struct {
-	Host string
-	Port int
+	Host     string
+	Port     int
+	User     string
+	Password string
 }
 
 type AppConfig struct {
@@ -38,6 +41,10 @@ type AppConfig struct {
 	MaxBody     int
 	MaxWorkers  int
 	MaxRequests int
+}
+
+type JWTConfig struct {
+	Secret string
 }
 
 func SetupConfig() (*Config, error) {
