@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS expenses
 (
-    id          uuid PRIMARY KEY,
+    id                uuid      DEFAULT Uuid_generate_v4() primary key,
     group_id    uuid           NOT NULL,
     user_id     uuid           NOT NULL,
     amount      varchar(255) NOT NULL,

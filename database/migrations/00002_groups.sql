@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS groups
 (
-    id         uuid PRIMARY KEY,
+    id                uuid      DEFAULT Uuid_generate_v4() primary key,
     name       VARCHAR(255) NOT NULL,
     owner_id   uuid         NOT NULL,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,

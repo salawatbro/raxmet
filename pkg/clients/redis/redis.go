@@ -13,13 +13,13 @@ var (
 	redisStorage *redis.Storage
 )
 
-func SetUpRedisClient(cfg *config.Config) {
+func SetUpRedisClient() {
 	once.Do(func() {
 		redisStorage = redis.New(redis.Config{
-			Host:      cfg.Redis.Host,
-			Port:      cfg.Redis.Port,
-			Username:  cfg.Redis.User,
-			Password:  cfg.Redis.Password,
+			Host:      config.Cfg.Redis.Host,
+			Port:      config.Cfg.Redis.Port,
+			Username:  config.Cfg.Redis.User,
+			Password:  config.Cfg.Redis.Password,
 			URL:       "",
 			Database:  0,
 			Reset:     false,

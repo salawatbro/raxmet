@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-func Setup(app *fiber.App, cfg *config.Config) {
+func Setup(app *fiber.App) {
 	// panic recovery
 	app.Use(recover.New())
 
@@ -25,9 +25,9 @@ func Setup(app *fiber.App, cfg *config.Config) {
 		AllowCredentials: true,
 	}))
 	// limit body size
-	app.Use(MaxBodySize(cfg.App.MaxBody))
+	app.Use(MaxBodySize(config.Cfg.App.MaxBody))
 	// limit repeated requests
-	app.Use(Limit(cfg.App.MaxRequests, 1))
+	app.Use(Limit(config.Cfg.App.MaxRequests, 1))
 	// http request logger
 	app.Use(logger.New(logger.Config{
 		Format:     `${time} ${locals:requestid} ${status} - ${method} ${url}` + "\n\n",
@@ -35,7 +35,7 @@ func Setup(app *fiber.App, cfg *config.Config) {
 	}))
 
 	// debugger
-	if cfg.App.Debug {
+	if config.Cfg.App.Debug {
 		app.Use(pprof.New())
 	}
 }

@@ -1,23 +1,27 @@
 package routes
 
 import (
-	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/salawatbro/raxmet/config"
+	"github.com/salawatbro/raxmet/internal/handlers"
+	"github.com/salawatbro/raxmet/internal/repository"
+	"github.com/salawatbro/raxmet/internal/services"
 )
 
-func ApiRoutes(app *fiber.App, cfg *config.Config) {
-	api := app.Group("/api")
-	api.Get("/v2", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+func ApiRoutes(app *fiber.App) {
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Not Found",
+		})
 	})
-	//jwt
+	//repositories
+	userRepo := repository.NewUserRepository()
+	//services
+	authService := services.NewAuthService(userRepo)
+	//handlers
+	authHandler := handlers.NewAuthHandler(authService)
 
-	app.Use(jwtware.New(jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte(cfg.JWT.Secret)},
-	}))
-	
-	api.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	api := app.Group("/api")
+	api.Post("/login", authHandler.Login)
+	api.Post("/register", authHandler.Register)
+	//jwt
 }

@@ -13,3 +13,7 @@ type Payment struct {
 	Amount    decimal.Decimal `json:"amount" gorm:"not null"`
 	CreatedAt time.Time       `json:"created_at" gorm:"default:now()"`
 }
+
+func (table *Payment) TableName() string {
+	return "payments"
+}

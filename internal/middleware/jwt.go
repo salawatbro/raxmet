@@ -1,11 +1,13 @@
 package middlewares
 
 import (
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
-	"strings"
+	"github.com/salawatbro/raxmet/config"
 )
 
-func getAuthorizationToken(ctx *fiber.Ctx) string {
-	authorizationToken := string(ctx.Request().Header.Peek("Authorization"))
-	return strings.Replace(authorizationToken, "Bearer ", "", 1)
+func JWT() fiber.Handler {
+	return jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(config.Cfg.JWT.Secret)},
+	})
 }

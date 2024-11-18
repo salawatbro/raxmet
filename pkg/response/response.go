@@ -1,10 +1,10 @@
 package response
 
 import (
+	"bytes"
 	"errors"
-	"github.com/salawatbro/raxmet/pkg/logger"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/salawatbro/raxmet/pkg/logger"
 )
 
 type defaultResponse struct {
@@ -41,91 +41,105 @@ func JsonPagination(ctx *fiber.Ctx, pagination *Pagination) error {
 	})
 }
 
-func JsonError(ctx *fiber.Ctx, err error, code string) error {
-	errorMessage := logErrorFormat(err, code)
+func JsonError(ctx *fiber.Ctx, errs []error, code string) error {
+	errorMessage := logErrorFormat(errs, code)
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusBadRequest).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusBadRequest,
 		Code:    code,
-		Message: err.Error(),
-		Data:    nil,
+		Message: errs[0].Error(),
+		Data:    errorsToStrings(errs),
 	})
 }
 
-func JsonErrorInternal(ctx *fiber.Ctx, err error, code string) error {
-	errorMessage := logErrorFormat(err, code)
+func JsonErrorInternal(ctx *fiber.Ctx, errs []error, code string) error {
+	errorMessage := logErrorFormat(errs, code)
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusInternalServerError).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusInternalServerError,
 		Code:    code,
-		Message: err.Error(),
-		Data:    nil,
+		Message: errs[0].Error(),
+		Data:    errorsToStrings(errs),
 	})
 }
 
-func JsonErrorValidation(ctx *fiber.Ctx, err error) error {
-	errorMessage := logErrorFormat(err, "E_VALIDATION")
+func JsonErrorValidation(ctx *fiber.Ctx, errs []error) error {
+	errorMessage := logErrorFormat(errs, "E_VALIDATION")
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusBadRequest).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusBadRequest,
 		Code:    "E_VALIDATION",
-		Message: err.Error(),
-		Data:    nil,
+		Message: errs[0].Error(),
+		Data:    errorsToStrings(errs),
 	})
 }
 
-func JsonErrorNotFound(ctx *fiber.Ctx, err error) error {
-	errorMessage := logErrorFormat(err, "E_NOT_FOUND")
+func JsonErrorNotFound(ctx *fiber.Ctx, errs []error) error {
+	errorMessage := logErrorFormat(errs, "E_NOT_FOUND")
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusNotFound).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusNotFound,
 		Code:    "E_NOT_FOUND",
-		Message: err.Error(),
-		Data:    nil,
+		Message: errs[0].Error(),
+		Data:    errorsToStrings(errs),
 	})
 }
 
-func JsonErrorUnauthorized(ctx *fiber.Ctx, err error) error {
-	errorMessage := logErrorFormat(err, "E_UNAUTHORIZED")
+func JsonErrorUnauthorized(ctx *fiber.Ctx, errs []error) error {
+	errorMessage := logErrorFormat(errs, "E_UNAUTHORIZED")
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusUnauthorized).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusUnauthorized,
 		Code:    "E_UNAUTHORIZED",
-		Message: err.Error(),
-		Data:    nil,
+		Message: errs[0].Error(),
+		Data:    errorsToStrings(errs),
 	})
 }
 
 func JsonErrorEnvironment(ctx *fiber.Ctx, env string) error {
 	err := errors.New("missing env " + env + " variable")
-	errorMessage := logErrorFormat(err, "E_ENV")
+	errorMessage := logErrorFormat([]error{err}, "E_ENV")
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusInternalServerError).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusInternalServerError,
 		Code:    "E_ENV",
 		Message: err.Error(),
-		Data:    nil,
+		Data:    []string{err.Error()},
 	})
 }
 
-func JsonErrorForbidden(ctx *fiber.Ctx, err error) error {
-	errorMessage := logErrorFormat(err, "E_FORBIDDEN")
+func JsonErrorForbidden(ctx *fiber.Ctx, errs []error) error {
+	errorMessage := logErrorFormat(errs, "E_FORBIDDEN")
 	logger.Logger.Error(errorMessage)
 	return ctx.Status(fiber.StatusForbidden).JSON(defaultResponse{
 		Success: false,
 		Status:  fiber.StatusForbidden,
 		Code:    "E_FORBIDDEN",
-		Message: err.Error(),
-		Data:    nil,
+		Message: errs[0].Error(),
+		Data:    errorsToStrings(errs),
 	})
 }
 
-func logErrorFormat(err error, code string) string {
-	return "❌ " + "[" + code + "] " + err.Error()
+func logErrorFormat(errs []error, code string) string {
+	var buffer bytes.Buffer
+	for _, err := range errs {
+		buffer.WriteString(err.Error())
+	}
+	return "❌ " + "[" + code + "] " + buffer.String()
+}
+
+func errorsToStrings(errs []error) interface{} {
+	var errsString []string
+	for _, err := range errs {
+		errsString = append(errsString, err.Error())
+	}
+	return fiber.Map{
+		"errors": errsString,
+	}
 }

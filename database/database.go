@@ -15,14 +15,14 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDatabase(cfg *config.Config) error {
+func ConnectDatabase() error {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable TimeZone=Asia/Tashkent",
-		cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password, cfg.Database.Name,
+		config.Cfg.Database.Host, config.Cfg.Database.Port, config.Cfg.Database.User, config.Cfg.Database.Password, config.Cfg.Database.Name,
 	)
 
 	var gormLogger logger.Interface
-	if cfg.App.Env == "production" {
+	if config.Cfg.App.Env == "production" {
 		gormLogger = logger.Default.LogMode(logger.Error)
 	} else {
 		gormLogger = logger.Default.LogMode(logger.Info)
@@ -51,6 +51,6 @@ func ConnectDatabase(cfg *config.Config) error {
 	sqlDB.SetConnMaxLifetime(30 * time.Minute)
 
 	DB = db
-	zaplogger.Logger.Info("Database connected successfully", zap.String("env", cfg.App.Env))
+	zaplogger.Logger.Info("Database connected successfully", zap.String("env", config.Cfg.App.Env))
 	return nil
 }

@@ -21,9 +21,17 @@ type Expense struct {
 	ExpenseShare []ExpenseShare `json:"expense_share" gorm:"foreignKey:expense_id"`
 }
 
+func (table *Expense) TableName() string {
+	return "expenses"
+}
+
 type ExpenseShare struct {
 	ID          uuid.UUID       `json:"id" gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
 	ExpenseID   uuid.UUID       `json:"expense_id" gorm:"type:uuid;not null"`
 	UserID      uuid.UUID       `json:"user_id" gorm:"type:uuid;not null"`
 	ShareAmount decimal.Decimal `json:"share_amount" gorm:"not null"`
+}
+
+func (table *ExpenseShare) TableName() string {
+	return "expense_shares"
 }

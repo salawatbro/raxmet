@@ -1,20 +1,14 @@
 package validators
 
 import (
+	"errors"
 	"github.com/go-playground/validator/v10"
 	"reflect"
 	"strings"
 )
 
-var customMessages = map[string]string{
-	"required": "This field is required",
-	"email":    "Invalid email format",
-	"min":      "Value is too short, minimum required is %s characters",
-	"max":      "Value is too long, maximum allowed is %s characters",
-}
-
-func ExtractValidationError(req interface{}) []string {
-	var messages []string
+func ExtractValidationError(req interface{}) []error {
+	var errs []error
 	v := validator.New()
 
 	v.RegisterTagNameFunc(func(fld reflect.StructField) string {
@@ -26,16 +20,9 @@ func ExtractValidationError(req interface{}) []string {
 	})
 
 	if err := v.Struct(req); err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			message := customMessages[err.Tag()]
-			if message == "" {
-				message = "Invalid value"
-			}
-			if err.Tag() == "min" || err.Tag() == "max" {
-				message = strings.Replace(message, "%s", err.Param(), 1)
-			}
-			messages = append(messages, err.Field()+": "+message)
+		for _, e := range err.(validator.ValidationErrors) {
+			errs = append(errs, errors.New(e.Field()+": "+e.Tag()))
 		}
 	}
-	return messages
+	return errs
 }

@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+	"time"
+)
 
 type Config struct {
 	App      AppConfig
@@ -45,9 +48,12 @@ type AppConfig struct {
 
 type JWTConfig struct {
 	Secret string
+	Exp    time.Duration
 }
 
-func SetupConfig() (*Config, error) {
+var Cfg *Config
+
+func SetupConfig() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -56,13 +62,13 @@ func SetupConfig() (*Config, error) {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
+		return err
 	}
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
-		return nil, err
+		return err
 	}
-
-	return &config, nil
+	Cfg = &config
+	return nil
 }

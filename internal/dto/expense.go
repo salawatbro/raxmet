@@ -20,6 +20,6 @@ type ExpenseShareDTO struct {
 	Amount string    `json:"amount" validate:"required"`
 }
 
-func (dto *ExpenseDTO) Validate() []string {
+func (dto *ExpenseDTO) Validate() []error {
 	return validators.ExtractValidationError(dto)
 }
